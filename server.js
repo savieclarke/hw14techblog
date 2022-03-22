@@ -1,37 +1,44 @@
-const express = require('express')
+const express = require('express');
 const path = require('path');
-const expressLayouts = require('express-ejs-layouts')
+const exphbs = require('express-handlebars');
+const helpers = require('./utils/helpers');
+
+const hbs = exphbs.create({ helpers });
 
 
 const app = express()
 
 
+
 app.set('views', path.join(__dirname, 'views'));
-app.engine('handlebars', exphb({defaultLayout: 'name'}))
+app.engine('handlebars', hbs.engine);
 app.set('view engine', 'handlebars');
 app.use(express.static('public'))
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
 
-app.listen(process.env.PORT || 3000)
+app.get('/', function (req,res) {
+    res.render('home', {
+        content: 'leave',
+        published: false
+    })
+});
+
+
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.use(require('./controllers/'));
 
 const Sequelize = require('sequelize');
 const mysql = require('mysql2');
 const dotenv = require('dotenv');
 const bcrypt = require('bcrypt');
-const handlebars = require('express-handlebars');
 const session = require('express-session');
 
 
-const indexRouter = require('./controllers/index')
 
-
-
-app.set('view engine', 'js') 
-app.set('views', __dirname + '/views')
-app.set ('layout', 'view/layout')
-app.use(expressLayouts)
-app.use(express.static('public'))
-
-app.use('/', indexRouter)
-
-app.listen(process.env.PORT || 3001)
+app.set('port', (process.env.PORT || 3000));
+app.listen(app.get('port'), function(){
+    console.log('Server Started');
+});
