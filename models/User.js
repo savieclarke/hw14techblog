@@ -23,7 +23,7 @@ User.init(
       allowNull: false
     },
     password: {
-      type: DataTypes.password,
+      type: DataTypes.STRING,
       allowNull: false,
       validate: {
         len: [4]
@@ -32,13 +32,14 @@ User.init(
   },
   {
     hooks: {
-      beforeCreate: async (newUser) => {
-        newUser.password = await bcrypt.hash(newUser.password, 10);
-        return newUser;
+      // set up beforeCreate lifecycle "hook" functionality
+      beforeCreate: async (newUserData) => {
+        newUserData.password = await bcrypt.hash(newUserData.password, 10);
+        return newUserData;
       },
-      beforeUpdate: async (updatedUser) => {
-        updatedUser.password = await bcrypt.hash(updatedUser.password, 10);
-        return updatedUser;
+      beforeUpdate: async (updatedUserData) => {
+        updatedUserData.password = await bcrypt.hash(updatedUserData.password, 10);
+        return updatedUserData;
       }
     },
     sequelize,
